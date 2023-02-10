@@ -128,7 +128,8 @@ namespace FishNet.Example.Prediction.Rigidbodies
                 if (_spawnBullet)
                 {
                     _spawnBullet = false;
-                    NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), transform.rotation);
+                    Debug.LogError("Spawn Bullet");
+                    NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), Quaternion.identity);
                     _lastSpawnedBullet = nob;
                     base.Spawn(nob);
                     //If not server add speed for client side.

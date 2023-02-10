@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3624261834906416601}
   - component: {fileID: 3624261834906416602}
   - component: {fileID: -6246116784124330627}
-  - component: {fileID: 7850526870340082268}
+  - component: {fileID: 6905281077981123058}
   m_Layer: 0
   m_Name: PredictedSphereSorta
   m_TagString: Untagged
@@ -30,8 +30,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3624261834906416581}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 15.312408, y: 6.390984, z: 25.2406}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3624261835462115340}
   m_Father: {fileID: 0}
@@ -68,6 +69,8 @@ MonoBehaviour:
   _graphicalObject: {fileID: 3624261835462115340}
   _enableTeleport: 0
   _teleportThreshold: 200
+  _ownerSmoothPosition: 1
+  _ownerSmoothRotation: 1
   _ownerInterpolation: 1
   _predictionType: 1
   _rigidbody: {fileID: 3624261834906416602}
@@ -92,16 +95,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NetworkObserver: {fileID: 0}
-  <PrefabId>k__BackingField: 35
-  <SpawnableCollectionId>k__BackingField: 0
-  _scenePathHash: 2281302723
-  <SceneId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 12142845903367415924
-  _sceneNetworkObjects:
-  - {fileID: 3624261834906416601}
   <IsNested>k__BackingField: 0
   <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
   _networkBehaviours:
   - {fileID: 3624261834906416600}
   - {fileID: -6246116784124330627}
@@ -111,6 +107,14 @@ MonoBehaviour:
   _isGlobal: 0
   _initializeOrder: 0
   _defaultDespawnType: 0
+  NetworkObserver: {fileID: 0}
+  <PrefabId>k__BackingField: 2
+  <SpawnableCollectionId>k__BackingField: 0
+  _scenePathHash: 2281302723
+  <SceneId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 12142845903367415924
+  _sceneNetworkObjects:
+  - {fileID: 3624261834906416601}
 --- !u!54 &3624261834906416602
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -142,8 +146,8 @@ MonoBehaviour:
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 3624261834906416601}
   _networkObjectCache: {fileID: 3624261834906416601}
-  Force: 20
---- !u!114 &7850526870340082268
+  Force: 2
+--- !u!114 &6905281077981123058
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -188,6 +192,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3624261834906416580}
   m_RootOrder: 0
@@ -211,10 +216,12 @@ MeshRenderer:
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -239,3 +246,4 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
