@@ -1,4 +1,5 @@
-﻿using FishNet;
+﻿using System;
+using FishNet;
 using FishNet.Object;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,9 +9,14 @@ public class BulletTest : NetworkBehaviour
 {
     public float Force;
 
+    private void Awake()
+    {
+        Debug.LogError("BulletTest Awake");
+    }
+
     public void SendSpeed()
     {
-        //Debug.Log("Local tick " + InstanceFinder.TimeManager.LocalTick);
+        Debug.LogError("BulletTest SendSpeed Local tick " + InstanceFinder.TimeManager.LocalTick);
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.AddForce((transform.forward * Force), ForceMode.Impulse);
     }

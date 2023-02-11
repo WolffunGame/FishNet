@@ -108,9 +108,9 @@ namespace FishNet.Example.Prediction.Rigidbodies
                     _nextJumpTime = Time.time + 1f;
                     _jump = true;
                 }
-                else if (Input.GetKeyDown(KeyCode.LeftShift))
+                else if (Input.GetKeyDown(KeyCode.Z))
                     _spawnBullet = true;
-                else if (Input.GetKeyDown(KeyCode.LeftAlt))
+                else if (Input.GetKeyDown(KeyCode.X))
                 {
                     _lastSpawnedBullet?.Despawn();
                 }
