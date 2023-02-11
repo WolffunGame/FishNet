@@ -105,6 +105,7 @@ namespace FishNet.Object
         /// <param name="visible"></param>
         private void UpdateRenderVisibility(bool visible)
         {
+            Debug.Log("UpdateRenderVisibility " + visible);
             bool rebuildRenderers = false;
 
             Renderer[] rs = _renderers;

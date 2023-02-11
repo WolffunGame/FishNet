@@ -1,4 +1,5 @@
 ﻿using FishNet;
+using FishNet.Connection;
 using FishNet.Object;
 using FishNet.Object.Prediction;
 using FishNet.Transporting;
@@ -125,27 +126,59 @@ namespace FishNet.Example.Prediction.Rigidbodies
                 CheckInput(out MoveData md);
                 Move(md, false);
 
-                if (_spawnBullet)
-                {
-                    _spawnBullet = false;
-                    Debug.LogError("Spawn Bullet");
-                    NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), Quaternion.identity);
-                    _lastSpawnedBullet = nob;
-                    base.Spawn(nob);
-                    //If not server add speed for client side.
-                    if (!base.IsServer)
-                    {
-                        BulletTest bt = nob.GetComponent<BulletTest>();
-                        bt.SendSpeed();
-                    }
-                }
+                // if (_spawnBullet)
+                // {
+                //     _spawnBullet = false;
+                //     Debug.LogError("Spawn Bullet");
+                //     NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), Quaternion.identity);
+                //     _lastSpawnedBullet = nob;
+                //     base.Spawn(nob);
+                //     //If not server add speed for client side.
+                //     if (!base.IsServer)
+                //     {
+                //         BulletTest bt = nob.GetComponent<BulletTest>();
+                //         bt.SendSpeed();
+                //     }
+                // }
             }
             if (base.IsServer)
             {
                 Move(default, true);
+                
             }
         }
+        
+        public override void OnSpawnServer(NetworkConnection connection)
+        {
+            base.OnSpawnServer(connection);
+            OnValidate();
+            if (Owner == connection)
+                TimeManager.OnPreTick += OnUpdateServer;
+        }
 
+        private float _curTime = 0.2f;
+        private float TimeSpawn = 0.2f;
+        protected virtual void OnUpdateServer()
+        {
+            var deltaTime = (float) TimeManager.TickDelta;
+            _curTime -= deltaTime;
+
+            if (_curTime > 0)
+                return;
+            _spawnBullet = true;
+            _curTime = TimeSpawn;
+            if (_spawnBullet)
+            {
+                _spawnBullet = false;
+                Debug.LogError("Spawn Bullet");
+                NetworkObject nob = Instantiate(BulletPrefab, transform.position + (transform.forward * 0.5f), Quaternion.identity);
+                _lastSpawnedBullet = nob;
+                NetworkManager.ServerManager.Spawn(nob);
+                //If not server add speed for client side.
+                BulletTest bt = nob.GetComponent<BulletTest>();
+                bt.SendSpeed();
+            }
+        }
 
         private void TimeManager_OnPostTick()
         {

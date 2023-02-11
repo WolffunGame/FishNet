@@ -440,7 +440,7 @@ namespace FishNet.Managing.Server
                 base.NetworkManager.LogError($"{networkObject.name} cannot be spawned because it has a parent NetworkObject {networkObject.ParentNetworkObject} which is not spawned.");
                 return;
             }
-
+            base.NetworkManager.LogError($"{networkObject.name} spawn with predictedSpawn {predictedSpawn}.");
             if (predictedSpawn)
                 base.NetworkManager.ClientManager.Objects.PredictedSpawn(networkObject, ownerConnection);
             else

@@ -196,11 +196,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Transport: {fileID: 192429405}
   _latencySimulator:
-    _enabled: 0
-    _simulateHost: 0
-    _latency: 0
-    _outOfOrder: 0
-    _packetLoss: 0
+    _enabled: 1
+    _simulateHost: 1
+    _latency: 400
+    _outOfOrder: 0.30000001192092896
+    _packetLoss: 0.30000001192092896
 --- !u!114 &192429408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,7 +220,7 @@ MonoBehaviour:
     Rotation: 2
     Scale: 2
   _changeFrameRate: 1
-  _frameRate: 500
+  _frameRate: 60
   _shareIds: 1
   _startOnHeadless: 1
   _limitClientMTU: 1
@@ -240,7 +240,7 @@ MonoBehaviour:
   _maximumServerReplicates: 15
   _maximumConsumeCount: 4
   _redundancyCount: 3
-  _allowPredictedSpawning: 1
+  _allowPredictedSpawning: 0
   _reservedObjectIds: 15
 --- !u!1 &212039606
 GameObject:
