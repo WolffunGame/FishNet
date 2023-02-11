@@ -196,11 +196,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Transport: {fileID: 192429405}
   _latencySimulator:
-    _enabled: 1
+    _enabled: 0
     _simulateHost: 0
-    _latency: 300
-    _outOfOrder: 0.20000000298023224
-    _packetLoss: 0.20000000298023224
+    _latency: 0
+    _outOfOrder: 0
+    _packetLoss: 0
 --- !u!114 &192429408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -867,7 +867,7 @@ PrefabInstance:
     - target: {fileID: 7443408887813606050, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
       propertyPath: _spawnablePrefabs
       value: 
-      objectReference: {fileID: 11400000, guid: 2440132bbd22268428af1c3be335f7ac, type: 2}
+      objectReference: {fileID: 11400000, guid: ac69c5d000f081d4e8688879d5afd032, type: 2}
     - target: {fileID: 7443408887813606050, guid: 0b650fca685f2eb41a86538aa883e4c1, type: 3}
       propertyPath: _refreshDefaultPrefabs
       value: 1
