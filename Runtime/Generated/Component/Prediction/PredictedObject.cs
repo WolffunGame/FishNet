@@ -11,6 +11,7 @@ namespace FishNet.Component.Prediction
     [AddComponentMenu("FishNet/Component/PredictedObject")]
     public partial class PredictedObject : NetworkBehaviour
     {
+#if !PREDICTION_V2
         #region Types.
         /// <summary>
         /// How to favor smoothing for predicted objects.
@@ -28,7 +29,11 @@ namespace FishNet.Component.Prediction
             /// <summary>
             /// Prefer smooth movement and corrections. Fast moving objects may collide before the graphical representation catches up.
             /// </summary>
-            Smoothness = 2,
+            Gradual = 2,
+            /// <summary>
+            /// Configure values to your preference.
+            /// </summary>
+            Custom = 3,
         }
         /// <summary>
         /// State of this object in a collision.
@@ -196,6 +201,17 @@ namespace FishNet.Component.Prediction
         [Tooltip("How to favor smoothing for predicted objects.")]
         [SerializeField]
         private SpectatorSmoothingType _spectatorSmoothingType = SpectatorSmoothingType.Mixed;
+        /// <summary>
+        /// Custom settings for smoothing data.
+        /// </summary>
+        [Tooltip("Custom settings for smoothing data.")]
+        [SerializeField]
+        private SmoothingData _customSmoothingData = _mixedSmoothingData;
+        /// <summary>
+        /// Preview of selected preconfigured smoothing data. This is only used for the inspector.
+        /// </summary>
+        [SerializeField]
+        private SmoothingData _preconfiguredSmoothingDataPreview = _mixedSmoothingData;
         /// <summary>
         /// Sets SpectactorSmoothingType value.
         /// </summary>
@@ -573,7 +589,17 @@ namespace FishNet.Component.Prediction
             {
                 InitializeSmoother(true);
             }
+            else
+            {
+                if (_spectatorSmoothingType == SpectatorSmoothingType.Accuracy)
+                    _preconfiguredSmoothingDataPreview = _accurateSmoothingData;
+                else if (_spectatorSmoothingType == SpectatorSmoothingType.Mixed)
+                    _preconfiguredSmoothingDataPreview = _mixedSmoothingData;
+                else if (_spectatorSmoothingType == SpectatorSmoothingType.Gradual)
+                    _preconfiguredSmoothingDataPreview = _gradualSmoothingData;
+            }
         }
+#endif
 #endif
     }
 

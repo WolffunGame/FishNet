@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using FishNet.Managing.Scened;
@@ -61,10 +62,11 @@ namespace GameSystem.Core
 
         public override float GetPercentComplete() => _currentAsyncHandle.IsValid() ? _currentAsyncHandle.PercentComplete : 1f;
 
-        public override async UniTask AsyncsIsDone()
+        public override IEnumerator AsyncsIsDone()
         {
             foreach (var ao in _loadAsyncHandles)
-                await UniTask.WaitUntil(() => ao.IsDone);
+                yield return new WaitUntil(()=>ao.IsDone);
         }
+       
     }
 }

@@ -11,14 +11,17 @@ namespace FishNet.Component.Transforming.Editing
     [CanEditMultipleObjects]
     public class NetworkTransformEditor : Editor
     {
-        private SerializedProperty _packing;
+        private SerializedProperty _componentConfiguration;
         private SerializedProperty _synchronizeParent;
+        private SerializedProperty _packing;
         private SerializedProperty _interpolation;
         private SerializedProperty _extrapolation;
         private SerializedProperty _enableTeleport;
         private SerializedProperty _teleportThreshold;
         private SerializedProperty _clientAuthoritative;
         private SerializedProperty _sendToOwner;
+        private SerializedProperty _useNetworkLod;
+        private SerializedProperty _interval;
         private SerializedProperty _synchronizePosition;
         private SerializedProperty _positionSnapping;
         private SerializedProperty _synchronizeRotation;
@@ -29,14 +32,17 @@ namespace FishNet.Component.Transforming.Editing
 
         protected virtual void OnEnable()
         {
-            _packing = serializedObject.FindProperty("_packing");
+            _componentConfiguration = serializedObject.FindProperty(nameof(_componentConfiguration));
             _synchronizeParent = serializedObject.FindProperty("_synchronizeParent");
+            _packing = serializedObject.FindProperty("_packing");
             _interpolation = serializedObject.FindProperty("_interpolation");
             _extrapolation = serializedObject.FindProperty("_extrapolation");
             _enableTeleport = serializedObject.FindProperty("_enableTeleport");
             _teleportThreshold = serializedObject.FindProperty("_teleportThreshold");
             _clientAuthoritative = serializedObject.FindProperty("_clientAuthoritative");
             _sendToOwner = serializedObject.FindProperty("_sendToOwner");
+            _useNetworkLod = serializedObject.FindProperty(nameof(_useNetworkLod));
+            _interval = serializedObject.FindProperty(nameof(_interval));
             _synchronizePosition = serializedObject.FindProperty("_synchronizePosition");
             _positionSnapping = serializedObject.FindProperty("_positionSnapping");
             _synchronizeRotation = serializedObject.FindProperty("_synchronizeRotation");
@@ -67,6 +73,7 @@ namespace FishNet.Component.Transforming.Editing
             //Misc.
             EditorGUILayout.LabelField("Misc", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_componentConfiguration);
             EditorGUILayout.PropertyField(_synchronizeParent, new GUIContent("* Synchronize Parent"));
             EditorGUILayout.PropertyField(_packing);
             EditorGUI.indentLevel--;
@@ -103,6 +110,14 @@ namespace FishNet.Component.Transforming.Editing
             //Synchronizing.
             EditorGUILayout.LabelField("Synchronizing.", EditorStyles.boldLabel);
             EditorGUI.indentLevel++;
+            //LOD and interval.
+            EditorGUILayout.PropertyField(_useNetworkLod, new GUIContent("Use Network Level of Detail"));
+            if (!_useNetworkLod.boolValue)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(_interval, new GUIContent("Send Interval"));
+                EditorGUI.indentLevel--;
+            }
             //Position.
             EditorGUILayout.PropertyField(_synchronizePosition);
             if (_synchronizePosition.boolValue)

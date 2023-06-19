@@ -12,6 +12,10 @@ namespace FishNet.Managing.Scened
     public class SceneLoadData
     {
         /// <summary>
+        /// When specified this scene will be set as the active scene after loading occurs.
+        /// </summary>
+        public SceneLookupData PreferredActiveScene = null;
+        /// <summary>
         /// SceneLookupData for each scene to load.
         /// </summary>
         public SceneLookupData[] SceneLookupDatas = new SceneLookupData[0];
@@ -171,38 +175,27 @@ namespace FishNet.Managing.Scened
 
             return default;
         }
-        internal bool IsDataValid(out string invalidReason)
-        {
-            invalidReason = string.Empty;
-            bool isValidData = true;
-            if (Params == null)
-            {
-                invalidReason += "Params is Null | ";
-                isValidData = false;
-            }
-            if (MovedNetworkObjects == null)
-            {
-                invalidReason += "MovedNetworkObjects is Null | ";
-                isValidData = false;
-            }
-            if (SceneLookupDatas == null)
-            {
-                invalidReason += "SceneLookupDatas is Null | ";
-                isValidData = false;
-            }
-            if (Options == null)
-            {
-                invalidReason += "Options is Null | ";
-                isValidData = false;
-            }
 
+
+        /// <summary>
+        /// Returns if any data is invalid, such as null entries.
+        /// </summary>
+        /// <returns></returns>
+        internal bool DataInvalid()
+        {
+            //Null values.
+            if (Params == null || MovedNetworkObjects == null || SceneLookupDatas == null ||
+                Options == null)
+                return true;
             //No lookups.
             if (SceneLookupDatas.Length == 0)
-            {
-                invalidReason += "No lookups";
-                isValidData = false;
-            }
-            return isValidData;
+                return true;
+
+            return false;
         }
+
+
     }
+
+
 }
