@@ -1,5 +1,6 @@
 ﻿using FishNet.Managing.Logging;
 using FishNet.Serializing.Helping;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -29,7 +30,7 @@ namespace FishNet.Managing.Scened
     /// <summary>
     /// Data container for looking up, loading, or unloading a scene.
     /// </summary>
-    public class SceneLookupData
+    public class SceneLookupData : IEquatable<SceneLookupData>
     {
         /// <summary>
         /// Handle of the scene. If value is 0, then handle is not used.
@@ -43,6 +44,11 @@ namespace FishNet.Managing.Scened
         /// Returns the scene name without a directory path should one exist.
         /// </summary>
         public string NameOnly => System.IO.Path.GetFileNameWithoutExtension(Name);
+        /// <summary>
+        /// Returns if this data is valid for use.
+        /// Being valid does not mean that the scene exist, rather that there is enough data to try and lookup a scene.
+        /// </summary>
+        public bool IsValid => (Name != string.Empty || Handle != 0);
 
         #region Const
         /// <summary>
@@ -162,7 +168,8 @@ namespace FishNet.Managing.Scened
 
         public override string ToString()
         {
-            return base.ToString();
+            return $"Name {Name}, Handle {Handle}";
+            //return base.ToString();
         }
         #endregion
 
@@ -208,7 +215,7 @@ namespace FishNet.Managing.Scened
         /// </summary>
         /// <param name="scenes">Scenes to create from.</param>
         /// <returns></returns>
-        public static SceneLookupData[] CreateData(IEnumerable<Scene> scenes)
+        public static SceneLookupData[] CreateData(Scene[] scenes)
         {
             bool invalidFound = false;
             List<SceneLookupData> result = new List<SceneLookupData>();
@@ -224,10 +231,8 @@ namespace FishNet.Managing.Scened
             }
 
             if (invalidFound)
-            {
-                if (NetworkManager.StaticCanLog(LoggingType.Warning))
-                    Debug.LogWarning(INVALID_SCENE);
-            }
+                NetworkManager.StaticLogWarning(INVALID_SCENE);
+
             return result.ToArray();
         }
         /// <summary>
@@ -252,10 +257,8 @@ namespace FishNet.Managing.Scened
             }
 
             if (invalidFound)
-            {
-                if (NetworkManager.StaticCanLog(LoggingType.Warning))
-                    Debug.LogWarning(INVALID_SCENE);
-            }
+                NetworkManager.StaticLogWarning(INVALID_SCENE);
+
             return result.ToArray();
         }
         /// <summary>
@@ -279,10 +282,8 @@ namespace FishNet.Managing.Scened
             }
 
             if (invalidFound)
-            {
-                if (NetworkManager.StaticCanLog(LoggingType.Warning))
-                    Debug.LogWarning(INVALID_SCENE);
-            }
+                NetworkManager.StaticLogWarning(INVALID_SCENE);
+
             return result.ToArray();
         }
         #endregion
@@ -298,8 +299,7 @@ namespace FishNet.Managing.Scened
 
             if (Handle == 0 && string.IsNullOrEmpty(Name))
             {
-                if (NetworkManager.StaticCanLog(LoggingType.Warning))
-                    Debug.LogWarning("Scene handle and name is unset; scene cannot be returned.");
+                NetworkManager.StaticLogWarning("Scene handle and name is unset; scene cannot be returned.");
                 return default;
             }
 
