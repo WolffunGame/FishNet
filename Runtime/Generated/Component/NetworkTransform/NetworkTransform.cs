@@ -611,7 +611,11 @@ namespace FishNet.Component.Transforming
             }
         }
 
-        private void OnDisable() => _currentGoalData.Dispose();
+        private void OnDisable()
+        {
+            _goalDataQueue.Clear();
+            _currentGoalData.Dispose();
+        } 
 
         public override void OnStartServer()
         {
@@ -1055,6 +1059,7 @@ namespace FishNet.Component.Transforming
             var localScale = tran.localScale;
             _lastReceivedTransformData.Update(0, localPosition, localRotation, localScale,
                 localPosition, parentBehaviour);
+            _currentGoalData.Transforms.Update(_lastReceivedTransformData);
             SetInstantRates(_currentGoalData.Rates);
         }
 
