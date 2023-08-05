@@ -62,11 +62,10 @@ namespace GameSystem.Core
 
         public override float GetPercentComplete() => _currentAsyncHandle.IsValid() ? _currentAsyncHandle.PercentComplete : 1f;
 
-        public override IEnumerator AsyncsIsDone()
+        public override async UniTask WaitAsyncIsDone()
         {
             foreach (var ao in _loadAsyncHandles)
-                yield return new WaitUntil(()=>ao.IsDone);
+               await ao;
         }
-       
     }
 }
