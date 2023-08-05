@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityScene = UnityEngine.SceneManagement.Scene;
@@ -81,13 +82,11 @@ namespace FishNet.Managing.Scened
         /// Activates scenes which were loaded.
         /// </summary>
         public abstract void ActivateLoadedScenes();
+
         /// <summary>
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerator AsyncsIsDone();
-
+        public virtual async UniTask WaitAsyncIsDone() { }
     }
-
-
 }

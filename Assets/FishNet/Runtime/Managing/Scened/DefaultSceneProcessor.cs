@@ -3,6 +3,7 @@ using UnityEngine;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 using UnityScene = UnityEngine.SceneManagement.Scene;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 
 namespace FishNet.Managing.Scened
 {
@@ -129,27 +130,10 @@ namespace FishNet.Managing.Scened
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public override IEnumerator AsyncsIsDone()
+        public override async UniTask WaitAsyncIsDone()
         {
-            bool notDone;
-            do
-            {
-                notDone = false;
-                foreach (AsyncOperation ao in LoadingAsyncOperations)
-                {
-
-                    if (!ao.isDone)
-                    {
-                        notDone = true;
-                        break;
-                    }
-                }
-                yield return null;
-            } while (notDone);
-
-            yield break;
+            foreach (var ao in LoadingAsyncOperations)
+                await ao;
         }
     }
-
-
 }
