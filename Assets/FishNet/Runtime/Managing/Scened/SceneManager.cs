@@ -1712,8 +1712,9 @@ namespace FishNet.Managing.Scened
             if (!asServer)
                 return;
             //Don't need to perform if not host.
-            if (!NetworkManager.IsClient)
-                return;
+            // Server will pooling for now
+            // if (!NetworkManager.IsClient)
+            //     return;
 
             var clientConn = NetworkManager.ClientManager.Connection;
             /* It would be nice to see if the client wasn't even in the scene
@@ -1735,7 +1736,7 @@ namespace FishNet.Managing.Scened
                 if (!nob.Observers.Contains(clientConn))
                     continue;
                 //Cannot move if not root.
-                if (nob.transform.root != null)
+                if (nob.transform.root != null && nob.transform.root != nob.transform)
                     continue;
 
                 /* If here nob is in the same being
