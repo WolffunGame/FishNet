@@ -1733,8 +1733,8 @@ namespace FishNet.Managing.Scened
                 if (nob.gameObject.scene != scene)
                     continue;
                 //ClientHost doesn't have visibility.
-                if (!nob.Observers.Contains(clientConn))
-                    continue;
+                // if (!nob.Observers.Contains(clientConn))
+                //     continue;
                 //Cannot move if not root.
                 if (nob.transform.root != null && nob.transform.root != nob.transform)
                     continue;
