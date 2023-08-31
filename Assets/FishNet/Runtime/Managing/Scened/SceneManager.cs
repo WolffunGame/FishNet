@@ -100,6 +100,11 @@ namespace FishNet.Managing.Scened
         public Dictionary<Scene, HashSet<NetworkConnection>> SceneConnections { get; } = new();
 
         /// <summary>
+        /// When scene is loaded on server but client is not loaded then scene is placed in here
+        /// </summary>
+        public Dictionary<Scene, HashSet<NetworkConnection>> loadedSceneOnlyServer = new();
+
+        /// <summary>
         /// 
         /// </summary>
         [Tooltip(
@@ -442,6 +447,23 @@ namespace FishNet.Managing.Scened
             var scenesToUnload = new List<Scene>();
             //Current active scene.
             var activeScene = UnitySceneManager.GetActiveScene();
+
+            foreach (var item in loadedSceneOnlyServer)
+            {
+                var scene = item.Key;
+                var hs = item.Value;
+
+                var removed = hs.Remove(conn);
+                
+                if (removed && hs.Count == 0 && (!SceneConnections.ContainsKey(scene) || SceneConnections[scene].Count == 0) &&
+                    !IsGlobalScene(scene) && !_manualUnloadScenes.Contains(scene) &&
+                    (scene != activeScene))
+                {
+                    if(!scenesToUnload.Contains(scene))
+                        scenesToUnload.Add(scene);
+                }
+            }
+            
             foreach (var item in SceneConnections)
             {
                 var scene = item.Key;
@@ -450,17 +472,23 @@ namespace FishNet.Managing.Scened
                 var removed = hs.Remove(conn);
                 /* If no more observers for scene, not a global scene, and not to be manually unloaded
                  * then remove scene from SceneConnections and unload it. */
-                if (removed && hs.Count == 0 &&
+                if (removed && hs.Count == 0 && (!loadedSceneOnlyServer.ContainsKey(scene) || loadedSceneOnlyServer[scene].Count == 0) &&
                     !IsGlobalScene(scene) && !_manualUnloadScenes.Contains(scene) &&
                     (scene != activeScene))
-                    scenesToUnload.Add(scene);
+                {
+                    if(!scenesToUnload.Contains(scene))
+                        scenesToUnload.Add(scene);
+                }
             }
 
             //If scenes should be unloaded.
             if (scenesToUnload.Count > 0)
             {
                 foreach (var s in scenesToUnload)
+                {
                     SceneConnections.Remove(s);
+                    loadedSceneOnlyServer.Remove(s);
+                }
                 var sud = new SceneUnloadData(SceneLookupData.CreateData(scenesToUnload));
                 UnloadConnectionScenes(Array.Empty<NetworkConnection>(), sud);
             }
@@ -566,6 +594,26 @@ namespace FishNet.Managing.Scened
 
             var args = new SceneLoadEndEventArgs(qd, skippedScenes.ToArray(), loadedScenes.ToArray(),
                 unloadedSceneNames);
+
+            if (qd.AsServer)
+            {
+                foreach (var scene in loadedScenes)
+                {
+                    if(!loadedSceneOnlyServer.ContainsKey(scene))
+                    {
+                        loadedSceneOnlyServer.Add(scene, new HashSet<NetworkConnection>());
+                    }
+
+                    foreach (var con in qd.Connections)
+                    {
+                        if (!loadedSceneOnlyServer[scene].Contains(con))
+                        {
+                            loadedSceneOnlyServer[scene].Add(con);
+                        }
+                    }
+                }
+            }
+            
             OnLoadEnd?.Invoke(args);
         }
 
@@ -1826,6 +1874,11 @@ namespace FishNet.Managing.Scened
                 //If not yet added to scene connections.
                 if (!inSceneConnections)
                     SceneConnections[scene] = hs;
+
+                if (loadedSceneOnlyServer.TryGetValueIL2CPP(scene, out var loadingConnection))
+                {
+                    loadingConnection.Remove(conn);
+                }
 
                 var arrayConn = new[] { conn };
                 InvokeClientPresenceChange(scene, arrayConn, true, true);
