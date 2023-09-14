@@ -615,6 +615,7 @@ namespace FishNet.Component.Transforming
         {
             _goalDataQueue.Clear();
             _currentGoalData.Dispose();
+            transform.rotation = Quaternion.identity;
         } 
 
         public override void OnStartServer()
