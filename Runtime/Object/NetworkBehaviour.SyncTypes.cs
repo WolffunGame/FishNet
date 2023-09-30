@@ -8,6 +8,7 @@ using FishNet.Serializing;
 using FishNet.Transporting;
 using FishNet.Utility.Extension;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace FishNet.Object
 {
@@ -161,7 +162,7 @@ namespace FishNet.Object
                     }
 
                     //Build writers for observers and owner.
-                    _syncTypeWriters = ArrayPool<SyncTypeWriter>.Shared.Rent(_readPermissions.Length);
+                    _syncTypeWriters = new SyncTypeWriter[_readPermissions.Length];
                     for (var i = 0; i < _syncTypeWriters.Length; i++)
                         _syncTypeWriters[i] = new SyncTypeWriter(_readPermissions[i]);
                 }
