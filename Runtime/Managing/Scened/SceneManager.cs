@@ -189,7 +189,7 @@ namespace FishNet.Managing.Scened
         /// <summary>
         /// Scenes which must be manually unloaded, even when emptied.
         /// </summary>
-        private HashSet<Scene> _manualUnloadScenes = new();
+        private HashSet<Scene> _manualUnloadScenes = new(new SceneCompare());
 
         /// <summary>
         /// Scene containing moved objects when changing single scene. On client this will contain all objects moved until the server destroys them.
