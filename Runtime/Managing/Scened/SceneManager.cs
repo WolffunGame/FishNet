@@ -2290,7 +2290,7 @@ namespace FishNet.Managing.Scened
         private Scene GetDelayedDestroyScene()
         {
             //Create moved objects scene. It will probably be used eventually. If not, no harm either way.
-            if (string.IsNullOrEmpty(_delayedDestroyScene.name))
+            if (_delayedDestroyScene == default)
                 _delayedDestroyScene = UnitySceneManager.CreateScene("DelayedDestroy");
             return _delayedDestroyScene;
         }
