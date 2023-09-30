@@ -8,7 +8,6 @@ namespace FishNet.Object
         {
             foreach (var syncType in _syncTypeWriters)
                 syncType.Dispose();
-            ArrayPool<SyncTypeWriter>.Shared.Return(_syncTypeWriters);
         }
     }
 }
