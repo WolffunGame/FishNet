@@ -6,8 +6,9 @@ namespace FishNet.Object
     {
         private void OnDestroy()
         {
-            foreach (var syncType in _syncTypeWriters)
-                syncType.Dispose();
+            if(_syncTypeWriters != null)
+                foreach (var syncType in _syncTypeWriters)
+                    syncType?.Dispose();
         }
     }
 }
