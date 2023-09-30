@@ -54,7 +54,7 @@ namespace FishNet.Serializing
         /// <summary>
         /// Buffer to prevent new allocations. This will grow as needed.
         /// </summary>
-        private byte[] _buffer = new byte[64];
+        private byte[] _buffer = new byte[1000];
         #endregion
 
         #region Const.
