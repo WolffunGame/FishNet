@@ -20,12 +20,12 @@ namespace FishNet.Managing.Object
 
         private static Scene _delayDestroyScene;
 
-        private static Scene DelayDestroyScene
+        private static Scene PoolScene
         {
             get
             {
                 if (string.IsNullOrEmpty(_delayDestroyScene.name))
-                    _delayDestroyScene = SceneManager.CreateScene("DelayedDestroyTemp");
+                    _delayDestroyScene = SceneManager.CreateScene("PollingScene");
                 return _delayDestroyScene;
             }
         }
@@ -119,8 +119,8 @@ namespace FishNet.Managing.Object
             //Do the same with SceneObjects.
             if (unexpectedlyDestroyed && nob.IsSceneObject)
                 RemoveFromSceneObjects(nob);
-            if (nob.transform == nob.transform.root)
-                SceneManager.MoveGameObjectToScene(nob.gameObject, DelayDestroyScene);
+            if (nob.transform == nob.transform.root && InstanceFinder.IsServerOnly)
+                SceneManager.MoveGameObjectToScene(nob.gameObject, PoolScene);
         }
 
         /// <summary>
