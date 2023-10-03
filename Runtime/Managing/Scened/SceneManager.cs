@@ -661,9 +661,9 @@ namespace FishNet.Managing.Scened
                             break;
                     }
                 }
-                finally
+                catch (Exception ex)
                 {
-                    _lock.ExitWriteLock();
+                    Debug.LogError(ex);
                 }
             }
             TryInvokeOnQueueEnd();
