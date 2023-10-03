@@ -650,6 +650,7 @@ namespace FishNet.Managing.Scened
                 {
                     _lock.EnterWriteLock();
                     var loadData = _queuedOperations.Dequeue();
+                    _lock.ExitWriteLock();
                     switch (loadData)
                     {
                         case LoadQueueData loadQueueData:
