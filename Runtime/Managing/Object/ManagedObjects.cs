@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine.SceneManagement;
+using UnityEngine;
+using FishNet.Managing.Logging;
 
 namespace FishNet.Managing.Object
 {
