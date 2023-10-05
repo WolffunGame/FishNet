@@ -11,7 +11,11 @@ using UnityEngine.SceneManagement;
 
 namespace FishNet.Connection
 {
-
+    internal class SceneCompare : IEqualityComparer<Scene>
+    {
+        public bool Equals(Scene x, Scene y) => x == y;
+        public int GetHashCode(Scene obj) => obj.name.GetHashCode();
+    }
     /// <summary>
     /// A container for a connected client used to perform actions on and gather information for the declared client.
     /// </summary>
@@ -110,10 +114,11 @@ namespace FishNet.Connection
 
             FirstObject = nob;
         }
+        
         /// <summary>
         /// Scenes this connection is in. Available to this connection and server.
         /// </summary>
-        public HashSet<Scene> Scenes { get; private set; } = new HashSet<Scene>();
+        public HashSet<Scene> Scenes { get; private set; } = new(new SceneCompare());
         /// <summary>
         /// True if this connection is being disconnected. Only available to server.
         /// </summary>

@@ -602,8 +602,9 @@ namespace FishNet.Component.Transforming
             _interval = Math.Max(_interval, (byte)1);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if (_receivedClientData.Writer != null)
             {
                 _receivedClientData.Writer.Store();
