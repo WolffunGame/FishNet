@@ -11,6 +11,7 @@ using FishNet.Utility.Performance;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -191,12 +192,13 @@ namespace FishNet.Managing.Scened
         /// <summary>
         /// Scenes to load or unload, in order.
         /// </summary>
-        private List<object> _queuedOperations = new();
-
+        private Queue<object> _queuedOperations = new();
+        private readonly ReaderWriterLockSlim _lock = new ();
+        private bool _isProcessingQueue;
         /// <summary>
         /// Scenes which must be manually unloaded, even when emptied.
         /// </summary>
-        private HashSet<Scene> _manualUnloadScenes = new();
+        private HashSet<Scene> _manualUnloadScenes = new(new SceneCompare());
 
         /// <summary>
         /// Scene containing moved objects when changing single scene. On client this will contain all objects moved until the server destroys them.
@@ -672,13 +674,19 @@ namespace FishNet.Managing.Scened
         private void QueueOperation(object data)
         {
             //Add to scene queue data.        
-            _queuedOperations.Add(data);
+            try
+            {
+                _lock.EnterWriteLock();
+                _queuedOperations.Enqueue(data);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
             /* If only one entry then scene operations are not currently in progress.
              * Should there be more than one entry then scene operations are already
              * occuring. The coroutine will automatically load in order. */
-
-            if (_queuedOperations.Count == 1)
-                __ProcessSceneQueue();
+            __ProcessSceneQueue();
         }
 
         /// <summary>
@@ -686,24 +694,37 @@ namespace FishNet.Managing.Scened
         /// </summary>
         private async void __ProcessSceneQueue()
         {
+            if(_isProcessingQueue)
+                return;
+            _isProcessingQueue = true;
             /* Queue start won't invoke unless a scene load or unload actually occurs.
              * For example: if a scene is already loaded, and nothing needs to be loaded,
              * queue start will not invoke. */
 
             while (_queuedOperations.Count > 0)
             {
-                //If a load scene.
-                if (_queuedOperations[0] is LoadQueueData)
-                    await __LoadScenes();
-                //If an unload scene.
-                else if (_queuedOperations[0] is UnloadQueueData)
-                    await __UnloadScenes();
-
-                if (_queuedOperations.Count > 0)
-                    _queuedOperations.RemoveAt(0);
+                try
+                {
+                    _lock.EnterWriteLock();
+                    var loadData = _queuedOperations.Dequeue();
+                    _lock.ExitWriteLock();
+                    switch (loadData)
+                    {
+                        case LoadQueueData loadQueueData:
+                            await __LoadScenes(loadQueueData);
+                            break;
+                        case UnloadQueueData unloadQueueData:
+                            await __UnloadScenes(unloadQueueData);
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(ex);
+                }
             }
-
             TryInvokeOnQueueEnd();
+            _isProcessingQueue = false;
         }
 
         #endregion
@@ -942,12 +963,10 @@ namespace FishNet.Managing.Scened
         /// Loads a connection scene queue data. This behaves just like a networked scene load except it sends only to the specified connections, and it always loads as an additive scene on server.
         /// </summary>
         /// <returns></returns>
-        private async UniTask __LoadScenes()
+        private async UniTask __LoadScenes(LoadQueueData data)
         {
             try
             {
-                if (_queuedOperations[0] is not LoadQueueData data)
-                    return;
                 var sceneLoadData = data.SceneLoadData;
                 //True if running as server.
                 var asServer = data.AsServer;
@@ -1579,11 +1598,8 @@ namespace FishNet.Managing.Scened
         /// Loads scenes within QueuedSceneLoads.
         /// </summary>
         /// <returns></returns>
-        private async UniTask __UnloadScenes()
+        private async UniTask __UnloadScenes(UnloadQueueData data)
         {
-            if (_queuedOperations[0] is not UnloadQueueData data)
-                return;
-            
             var sceneUnloadData = data.SceneUnloadData;
             //If connection went inactive.
             if (!ConnectionActive(data.AsServer))
@@ -2347,7 +2363,7 @@ namespace FishNet.Managing.Scened
         private Scene GetDelayedDestroyScene()
         {
             //Create moved objects scene. It will probably be used eventually. If not, no harm either way.
-            if (string.IsNullOrEmpty(_delayedDestroyScene.name))
+            if (_delayedDestroyScene == default)
                 _delayedDestroyScene = UnitySceneManager.CreateScene("DelayedDestroy");
             return _delayedDestroyScene;
         }
