@@ -65,7 +65,7 @@ namespace GameSystem.Core
         public override async UniTask WaitAsyncIsDone()
         {
             foreach (var ao in _loadAsyncHandles)
-               await ao;
+                await UniTask.WaitUntil(() => ao.IsDone);
         }
     }
 }
