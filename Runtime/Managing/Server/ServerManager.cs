@@ -410,8 +410,24 @@ namespace FishNet.Managing.Server
                 {
                     NetworkManager.Log($"Remote connection started for Id {id}.");
                     NetworkConnection conn = new NetworkConnection(NetworkManager, id, args.TransportIndex, true);
-                    Clients.Add(args.ConnectionId, conn);
-                    OnRemoteConnectionState?.Invoke(conn, args);
+                    
+                    if(Clients.TryGetValue(args.ConnectionId, out var prevConn))
+                    {
+                        // Some error occured, that still connection in Dictionary
+                        Clients.Remove(args.ConnectionId);
+                    }
+                    
+                    Clients.TryAdd(args.ConnectionId, conn);
+
+                    try
+                    {
+                        OnRemoteConnectionState?.Invoke(conn, args);
+                    }
+                    catch (Exception ex)
+                    {
+                        NetworkManager.LogError($"Exception occured when do OnRemoteConnectionState callback: {ex.Message}");
+                    }
+                    
                     //Connection is no longer valid. This can occur if the user changes the state using the OnRemoteConnectionState event.
                     if (!conn.IsValid)
                         return;
@@ -431,7 +447,15 @@ namespace FishNet.Managing.Server
                     if (Clients.TryGetValueIL2CPP(id, out NetworkConnection conn))
                     {
                         conn.SetDisconnecting(true);
-                        OnRemoteConnectionState?.Invoke(conn, args);
+
+                        try
+                        {
+                            OnRemoteConnectionState?.Invoke(conn, args);
+                        }
+                        catch (Exception ex)
+                        {
+                            NetworkManager.LogError($"Exception occured when do OnRemoteConnectionState callback: {ex.Message}");
+                        }
                         Clients.Remove(id);
                         Objects.ClientDisconnected(conn);
                         BroadcastClientConnectionChange(false, conn);
