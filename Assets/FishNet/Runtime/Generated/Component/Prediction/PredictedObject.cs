@@ -218,8 +218,8 @@ namespace FishNet.Component.Prediction
         /// <param name="value">Value to use.</param>
         public void SetSpectatorSmoothingType(SpectatorSmoothingType value)
         {
-            if (base.IsSpawned)
-                base.NetworkManager.LogWarning($"Spectator smoothing type may only be set before the object is spawned, such as after instantiating but before spawning.");
+            if (IsSpawned)
+                NetworkManager.LogWarning($"Spectator smoothing type may only be set before the object is spawned, such as after instantiating but before spawning.");
             else
                 _spectatorSmoothingType = value;
         }
@@ -311,13 +311,13 @@ namespace FishNet.Component.Prediction
             /* If host then initialize owner smoother.
              * Host will use owner smoothing settings for more
              * accurate results. */
-            if (base.IsHost)
+            if (IsHost)
                 InitializeSmoother(true);
 
             UpdateRigidbodiesCount(true);
             ConfigureRigidbodies();
             ConfigureNetworkTransform();
-            base.TimeManager.OnPostTick += TimeManager_OnPostTick;
+            TimeManager.OnPostTick += TimeManager_OnPostTick;
         }
 
         public override void OnSpawnServer(NetworkConnection connection)
@@ -340,7 +340,7 @@ namespace FishNet.Component.Prediction
              * owner smoother. The owner smoother
              * is not predictive and is preferred
              * for more real time graphical results. */
-            if (base.IsOwner && !base.IsServer)
+            if (IsOwner && !IsServer)
             {
                 /* If has prediction methods implement for owner,
                  * otherwise implement for spectator. */
@@ -349,13 +349,13 @@ namespace FishNet.Component.Prediction
                  * prediction methods as the spectator smoother is used
                  * for these scenarios. */
                 if (!_implementsPredictionMethods)
-                    SetTargetSmoothing(base.TimeManager.RoundTripTime, true);
+                    SetTargetSmoothing(TimeManager.RoundTripTime, true);
             }
             //Not owner nor server, initialize spectator smoother if using rigidbodies.
             else if (_predictionType != PredictionType.Other)
             {
                 InitializeSmoother(false);
-                SetTargetSmoothing(base.TimeManager.RoundTripTime, true);
+                SetTargetSmoothing(TimeManager.RoundTripTime, true);
             }
 
             Rigidbodies_OnOwnershipClient(prevOwner);
@@ -367,7 +367,7 @@ namespace FishNet.Component.Prediction
 
             ChangeSubscriptions(false);
             UpdateRigidbodiesCount(false);
-            base.TimeManager.OnPostTick -= TimeManager_OnPostTick;
+            TimeManager.OnPostTick -= TimeManager_OnPostTick;
         }
 
         /// <summary>
@@ -381,7 +381,7 @@ namespace FishNet.Component.Prediction
             if (_predictionType == PredictionType.Other)
                 return;
 
-            NetworkManager nm = base.NetworkManager;
+            NetworkManager nm = NetworkManager;
             if (nm == null)
                 return;
 
@@ -415,7 +415,7 @@ namespace FishNet.Component.Prediction
 
         private void TimeManager_OnPreTick()
         {
-            _localTick = base.TimeManager.LocalTick;
+            _localTick = TimeManager.LocalTick;
             _spectatorSmoother?.OnPreTick();
             _ownerSmoother?.OnPreTick();
         }
@@ -434,37 +434,37 @@ namespace FishNet.Component.Prediction
         /// <param name="subscribe"></param>
         private void ChangeSubscriptions(bool subscribe)
         {
-            if (base.TimeManager == null)
+            if (TimeManager == null)
                 return;
             if (subscribe == _clientSubscribed)
                 return;
 
             if (subscribe)
             {
-                base.TimeManager.OnUpdate += TimeManager_OnUpdate;
-                base.TimeManager.OnPreTick += TimeManager_OnPreTick;
+                TimeManager.OnUpdate += TimeManager_OnUpdate;
+                TimeManager.OnPreTick += TimeManager_OnPreTick;
                 //Only client will use these events.
-                if (!base.IsServer)
+                if (!IsServer)
                 {
-                    base.PredictionManager.OnPreReplicateReplay += PredictionManager_OnPreReplicateReplay;
-                    base.PredictionManager.OnPostReplicateReplay += PredictionManager_OnPostReplicateReplay;
-                    base.PredictionManager.OnPreReconcile += PredictionManager_OnPreReconcile;
-                    base.PredictionManager.OnPostReconcile += PredictionManager_OnPostReconcile;
-                    base.TimeManager.OnRoundTripTimeUpdated += TimeManager_OnRoundTripTimeUpdated;
+                    PredictionManager.OnPreReplicateReplay += PredictionManager_OnPreReplicateReplay;
+                    PredictionManager.OnPostReplicateReplay += PredictionManager_OnPostReplicateReplay;
+                    PredictionManager.OnPreReconcile += PredictionManager_OnPreReconcile;
+                    PredictionManager.OnPostReconcile += PredictionManager_OnPostReconcile;
+                    TimeManager.OnRoundTripTimeUpdated += TimeManager_OnRoundTripTimeUpdated;
                 }
             }
             else
             {
-                base.TimeManager.OnUpdate -= TimeManager_OnUpdate;
-                base.TimeManager.OnPreTick -= TimeManager_OnPreTick;
+                TimeManager.OnUpdate -= TimeManager_OnUpdate;
+                TimeManager.OnPreTick -= TimeManager_OnPreTick;
                 //Only client will use these events.
-                if (!base.IsServer)
+                if (!IsServer)
                 {
-                    base.PredictionManager.OnPreReplicateReplay -= PredictionManager_OnPreReplicateReplay;
-                    base.PredictionManager.OnPostReplicateReplay -= PredictionManager_OnPostReplicateReplay;
-                    base.PredictionManager.OnPreReconcile -= PredictionManager_OnPreReconcile;
-                    base.PredictionManager.OnPostReconcile -= PredictionManager_OnPostReconcile;
-                    base.TimeManager.OnRoundTripTimeUpdated -= TimeManager_OnRoundTripTimeUpdated;
+                    PredictionManager.OnPreReplicateReplay -= PredictionManager_OnPreReplicateReplay;
+                    PredictionManager.OnPostReplicateReplay -= PredictionManager_OnPostReplicateReplay;
+                    PredictionManager.OnPreReconcile -= PredictionManager_OnPreReconcile;
+                    PredictionManager.OnPostReconcile -= PredictionManager_OnPostReconcile;
+                    TimeManager.OnRoundTripTimeUpdated -= TimeManager_OnRoundTripTimeUpdated;
                 }
 
                 //Also some resets

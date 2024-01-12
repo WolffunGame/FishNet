@@ -88,12 +88,12 @@ namespace FishNet.Component.Prediction
             EditorGUI.indentLevel--;
 
             EditorGUILayout.PropertyField(_predictionType);
-            PredictedObject.PredictionType movementType = (PredictedObject.PredictionType)_predictionType.intValue;
-            if (movementType != PredictedObject.PredictionType.Other)
+            PredictionType movementType = (PredictionType)_predictionType.intValue;
+            if (movementType != PredictionType.Other)
             {
                 EditorGUI.indentLevel++;
                 EditorGUILayout.HelpBox("When using physics prediction do not include a NetworkTransform; this component will synchronize instead.", MessageType.Info);
-                if (movementType == PredictedObject.PredictionType.Rigidbody)
+                if (movementType == PredictionType.Rigidbody)
                     EditorGUILayout.PropertyField(_rigidbody);
                 else
                     EditorGUILayout.PropertyField(_rigidbody2d, new GUIContent("Rigidbody2D", "Rigidbody2D to predict."));
@@ -125,8 +125,8 @@ namespace FishNet.Component.Prediction
                 EditorGUILayout.PropertyField(_maintainedVelocity);
 
                 EditorGUILayout.PropertyField(_resendType);
-                PredictedObject.ResendType resendType = (PredictedObject.ResendType)_resendType.intValue;
-                if (resendType == PredictedObject.ResendType.Interval)
+                ResendType resendType = (ResendType)_resendType.intValue;
+                if (resendType == ResendType.Interval)
                 {
                     EditorGUI.indentLevel++;
                     EditorGUILayout.PropertyField(_resendInterval, new GUIContent("Interval"));

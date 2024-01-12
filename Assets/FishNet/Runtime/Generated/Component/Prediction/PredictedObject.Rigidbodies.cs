@@ -53,7 +53,7 @@ namespace FishNet.Component.Prediction
         /// <summary>
         /// True if owner and implements prediction methods.
         /// </summary>
-        internal bool IsPredictingOwner() => (base.IsOwner && _implementsPredictionMethods);
+        internal bool IsPredictingOwner() => (IsOwner && _implementsPredictionMethods);
         #endregion
         #region Private.
         /// <summary>
@@ -87,7 +87,7 @@ namespace FishNet.Component.Prediction
         /// <summary>
         /// True if a connection is owner and prediction methods are implemented.
         /// </summary>
-        private bool _isPredictingOwner(NetworkConnection c) => (c == base.Owner && _implementsPredictionMethods);
+        private bool _isPredictingOwner(NetworkConnection c) => (c == Owner && _implementsPredictionMethods);
         /// <summary>
         /// Current interpolation value.
         /// </summary>
@@ -115,7 +115,7 @@ namespace FishNet.Component.Prediction
         /// <summary>
         /// Local client objects this object is currently colliding with.
         /// </summary>
-        private HashSet<GameObject> _localClientCollidedObjects = new HashSet<GameObject>();
+        private HashSet<UnityEngine.Component> _localClientColliders = new ();
         /// <summary>
         /// True if spectator prediction is paused.
         /// </summary>
@@ -154,7 +154,7 @@ namespace FishNet.Component.Prediction
         {
             if (!IsRigidbodyPrediction)
                 return;
-            if (c == base.Owner)
+            if (c == Owner)
                 return;
             if (c.IsLocalClient)
                 return;
@@ -172,7 +172,7 @@ namespace FishNet.Component.Prediction
         private void Rigidbodies_OnStartClient()
         {
             //Store up to 1 second of states.
-            int capacity = base.TimeManager.TickRate;
+            int capacity = TimeManager.TickRate;
             /* Only need to check one collection capacity since they both will be the same.
              * If capacity does not line up then re-initialize. */
             if (capacity != _rigidbodyStates.Capacity)
@@ -191,7 +191,7 @@ namespace FishNet.Component.Prediction
             if (!IsRigidbodyPrediction)
                 return;
             //If owner no need to fix for animators.
-            if (base.IsOwner)
+            if (IsOwner)
                 return;
             //Would have already fixed if animators are set.
             if (_animatorsInitialized)
@@ -206,7 +206,7 @@ namespace FishNet.Component.Prediction
 #if UNITY_2022_1_OR_NEWER
                     _graphicalAnimators[i].keepAnimatorStateOnDisable = true;
 #else
-                    _graphicalAnimators[i].keepAnimatorControllerStateOnDisable = true;
+                    _graphicalAnimators[i].keepAnimatorStateOnDisable = true;
 #endif
 
                 /* True if at least one animator is on the graphical root. 
@@ -237,7 +237,7 @@ namespace FishNet.Component.Prediction
         {
             if (!IsRigidbodyPrediction)
                 return;
-            if (base.IsServer)
+            if (IsServer)
                 return;
 
             bool is2D = (_predictionType == PredictionType.Rigidbody2D);
@@ -247,7 +247,7 @@ namespace FishNet.Component.Prediction
             if (_rigidbodyStates.Initialized)
             {
                 if (_localTick == 0)
-                    _localTick = base.TimeManager.LocalTick;
+                    _localTick = TimeManager.LocalTick;
 
                 if (!is2D)
                     _rigidbodyStates.Add(new RigidbodyState(_rigidbody, _localTick));
@@ -279,7 +279,7 @@ namespace FishNet.Component.Prediction
              * While not ignoring ticks is always an option
              * its not ideal because ignoring ticks helps
              * prevent over predicting. */
-            if (_collisionStayedTick != 0 && (base.TimeManager.LocalTick != _collisionStayedTick))
+            if (_collisionStayedTick != 0 && (TimeManager.LocalTick != _collisionStayedTick))
                 CollisionExited();
         }
 
@@ -427,8 +427,8 @@ namespace FishNet.Component.Prediction
             //Allow update if ping jump is large enough.
             if (difference < 50)
             {
-                uint tickInterval = base.TimeManager.TimeToTicks(5f, Managing.Timing.TickRounding.RoundUp);
-                if (base.TimeManager.LocalTick - _lastPingUpdateTick < tickInterval)
+                uint tickInterval = TimeManager.TimeToTicks(5f, TickRounding.RoundUp);
+                if (TimeManager.LocalTick - _lastPingUpdateTick < tickInterval)
                     return;
             }
             SetTargetSmoothing(ping, false);
@@ -442,7 +442,7 @@ namespace FishNet.Component.Prediction
             if (_spectatorSmoother == null)
                 return;
 
-            _lastPingUpdateTick = base.TimeManager.LocalTick;
+            _lastPingUpdateTick = TimeManager.LocalTick;
             _lastPing = ping;
             SetValues();
             //Ignored ticks will be less for predicted spawner.
@@ -482,7 +482,7 @@ namespace FishNet.Component.Prediction
                 else
                     data = _customSmoothingData;
 
-                TimeManager tm = base.TimeManager;
+                TimeManager tm = TimeManager;
                 double interpolationTime = (ping / 1000d) * data.InterpolationPercent;
                 _targetSpectatorInterpolation = tm.TimeToTicks(interpolationTime, TickRounding.RoundUp);
                 double collisionInterpolationTime = (ping / 1000d) * data.CollisionInterpolationPercent;
@@ -501,7 +501,7 @@ namespace FishNet.Component.Prediction
         {
             /* If it's been more than 1 tick since collision stayed
              * then do not consider as collided. */
-            return (base.TimeManager.LocalTick - _collisionStayedTick) < 1;
+            return (TimeManager.LocalTick - _collisionStayedTick) < 1;
         }
 
         private uint _igtt;
@@ -523,14 +523,9 @@ namespace FishNet.Component.Prediction
         /// <summary>
         /// Called when a collision occurs and the smoothing type must perform operations.
         /// </summary>
-        private bool CollisionEnteredLocalClientObject(GameObject go)
-        {
-            if (go.TryGetComponent<NetworkObject>(out NetworkObject nob))
-                return nob.Owner.IsLocalClient;
+        private static bool CollisionEnteredLocalClientObject(UnityEngine.Component tran)
+            => tran.TryGetComponent<NetworkObject>(out var nob) && nob.Owner.IsLocalClient;
 
-            //Fall through.
-            return false;
-        }
 
         /// <summary>
         /// Sends the rigidbodies state to Observers of a NetworkBehaviour.
@@ -569,17 +564,17 @@ namespace FishNet.Component.Prediction
              * is true but we want to save perf by exiting
              * early before checks and serialization when
              * we know the conn is not an observer. */
-            if (!base.Observers.Contains(nbOwner))
+            if (!Observers.Contains(nbOwner))
                 return;
 
-            bool hasChanged = base.PredictedTransformMayChange();
+            bool hasChanged = PredictedTransformMayChange();
             if (!hasChanged)
             {
                 //Not changed but was previous tick. Reset resends.
                 if (_previouslyChanged)
-                    _resendsRemaining = base.TimeManager.TickRate;
+                    _resendsRemaining = TimeManager.TickRate;
 
-                uint currentTick = base.TimeManager.Tick;
+                uint currentTick = TimeManager.Tick;
                 //Resends remain.
                 if (_resendsRemaining > 0)
                 {
@@ -794,7 +789,7 @@ namespace FishNet.Component.Prediction
         {
             if (!IsRigidbodyPrediction)
                 return false;
-            if (base.IsServer || IsPredictingOwner())
+            if (IsServer || IsPredictingOwner())
                 return false;
             if (_spectatorPaused)
                 return false;
@@ -835,10 +830,8 @@ namespace FishNet.Component.Prediction
         {
             if (_predictionType != PredictionType.Rigidbody)
                 return;
-
-            GameObject go = collision.gameObject;
-            if (CollisionEnteredLocalClientObject(go))
-                CollisionEntered(go);
+            if (CollisionEnteredLocalClientObject(collision.transform))
+                CollisionEntered(collision.collider);
         }
 
 
@@ -847,8 +840,8 @@ namespace FishNet.Component.Prediction
             if (_predictionType != PredictionType.Rigidbody)
                 return;
 
-            if (_localClientCollidedObjects.Contains(collision.gameObject))
-                _collisionStayedTick = base.TimeManager.LocalTick;
+            if (_localClientColliders.Contains(collision.collider))
+                _collisionStayedTick = TimeManager.LocalTick;
         }
 
         /// <summary>
@@ -907,7 +900,7 @@ namespace FishNet.Component.Prediction
             //No need to send to owner if they implement prediction methods.
             if (_isPredictingOwner(conn))
                 return;
-            reconcileTick = (conn == base.NetworkObject.PredictedSpawner) ? conn.PacketTick.RemoteTick : reconcileTick;
+            reconcileTick = (conn == NetworkObject.PredictedSpawner) ? conn.PacketTick.RemoteTick : reconcileTick;
             RigidbodyState state = new RigidbodyState(_rigidbody, reconcileTick);
             TargetSendRigidbodyState(conn, state, applyImmediately);
         }
@@ -928,7 +921,7 @@ namespace FishNet.Component.Prediction
                  * was the one to predicted spawn this object. When that is
                  * the case do not apply initial velocities, but so allow
                  * regular updates/corrections. */
-                if (base.NetworkObject.PredictedSpawner.IsLocalClient)
+                if (NetworkObject.PredictedSpawner.IsLocalClient)
                     return;
             }
             else
@@ -997,10 +990,8 @@ namespace FishNet.Component.Prediction
         {
             if (_predictionType != PredictionType.Rigidbody2D)
                 return;
-
-            GameObject go = collision.gameObject;
-            if (CollisionEnteredLocalClientObject(go))
-                CollisionEntered(go);
+            if (CollisionEnteredLocalClientObject(collision.transform))
+                CollisionEntered(collision.collider);
         }
 
         private void OnCollisionStay2D(Collision2D collision)
@@ -1008,17 +999,17 @@ namespace FishNet.Component.Prediction
             if (_predictionType != PredictionType.Rigidbody2D)
                 return;
 
-            if (_localClientCollidedObjects.Contains(collision.gameObject))
-                _collisionStayedTick = base.TimeManager.LocalTick;
+            if (_localClientColliders.Contains(collision.collider))
+                _collisionStayedTick = TimeManager.LocalTick;
         }
 
         /// <summary>
         /// Called when collision has entered a local clients object.
         /// </summary>
-        private void CollisionEntered(GameObject go)
+        private void CollisionEntered(UnityEngine.Component col)
         {
-            _collisionStayedTick = base.TimeManager.LocalTick;
-            _localClientCollidedObjects.Add(go);
+            _collisionStayedTick = TimeManager.LocalTick;
+            _localClientColliders.Add(col);
         }
 
         /// <summary>
@@ -1026,7 +1017,7 @@ namespace FishNet.Component.Prediction
         /// </summary>
         private void CollisionExited()
         {
-            _localClientCollidedObjects.Clear();
+            _localClientColliders.Clear();
             _collisionStayedTick = 0;
         }
 
@@ -1105,7 +1096,7 @@ namespace FishNet.Component.Prediction
                  * was the one to predicted spawn this object. When that is
                  * the case do not apply initial velocities, but so allow
                  * regular updates/corrections. */
-                if (base.NetworkObject.PredictedSpawner.IsLocalClient)
+                if (NetworkObject.PredictedSpawner.IsLocalClient)
                     return;
             }
             else

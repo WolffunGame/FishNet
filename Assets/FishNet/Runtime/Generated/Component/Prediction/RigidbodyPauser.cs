@@ -290,7 +290,7 @@ namespace FishNet.Component.Prediction
 
             //Parent went null, then graphicalObject needs to be destroyed.
             if (_graphicalParent == null && _graphicalObject != null)
-                MonoBehaviour.Destroy(_graphicalObject.gameObject);
+                UnityEngine.Object.Destroy(_graphicalObject.gameObject);
             else
                 _graphicalObject?.SetParent(_graphicalParent);
 
