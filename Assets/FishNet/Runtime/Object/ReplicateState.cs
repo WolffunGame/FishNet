@@ -31,7 +31,7 @@ namespace FishNet.Object
         /// Data was received for the replayed tick.
         /// This occurs when a replicate would be replaying past datas, triggered by a reconcile, and there is user created data for the tick.
         /// </summary>
-        ReplayeCreated = 4,
+        ReplayedCreated = 4,
         /// <summary>
         /// Client has not run the tick locally yet. This can be used to exit replicate early to not process actions, or create actions based on previous datas.
         /// </summary>
@@ -47,14 +47,14 @@ namespace FishNet.Object
         /// <summary>
         /// Returns if value is replayed.
         /// </summary>
-        public static bool IsReplayed(this ReplicateState value) => (value == ReplicateState.ReplayedPredicted || value == ReplicateState.ReplayeCreated || value == ReplicateState.Future);
+        public static bool IsReplayed(this ReplicateState value) => value is ReplicateState.ReplayedPredicted or ReplicateState.ReplayedCreated or ReplicateState.Future;
         /// <summary>
         /// Returns if value is user created.
         /// </summary>
-        public static bool IsCreated(this ReplicateState value) => (value == ReplicateState.CurrentCreated || value == ReplicateState.ReplayeCreated);
+        public static bool IsCreated(this ReplicateState value) => value is ReplicateState.CurrentCreated or ReplicateState.ReplayedCreated;
         /// <summary>
         /// Returns if value is predicted.
         /// </summary>
-        public static bool IsPredicted(this ReplicateState value) => (value == ReplicateState.Future || value == ReplicateState.CurrentPredicted || value == ReplicateState.ReplayedPredicted);
+        public static bool IsPredicted(this ReplicateState value) => value is ReplicateState.Future or ReplicateState.CurrentPredicted or ReplicateState.ReplayedPredicted;
     }
 }

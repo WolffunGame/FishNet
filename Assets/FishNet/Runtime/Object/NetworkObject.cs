@@ -277,9 +277,6 @@ namespace FishNet.Object
             _isStatic = gameObject.isStatic;
             RuntimeChildNetworkBehaviours = CollectionCaches<NetworkBehaviour>.RetrieveList();
             SetChildDespawnedState();
-#if PREDICTION_V2
-            //Prediction_Awake();
-#endif
         }
 
         protected virtual void Start()
@@ -395,16 +392,13 @@ namespace FishNet.Object
             void DeinitializePrediction_V2(bool asServer)
             {
 #if PREDICTION_V2
-                Prediction_Deinitialize(asServer);
+                Prediction_Deinitialize();
 #endif
             }
         }
 
 #if PREDICTION_V2
-        private void Update()
-        {
-            Prediction_Update();
-        }
+        private void Update()=>Prediction_Update();
 #endif
 
         /// <summary>
@@ -557,7 +551,7 @@ namespace FishNet.Object
             _networkObserverInitiliazed = true;
 
 #if PREDICTION_V2
-            Prediction_Preinitialize(networkManager, asServer);
+            Prediction_PreInitialize(networkManager, asServer);
 #endif
             //Add to connections objects. Collection is a hashset so this can be called twice for clientHost.
             owner?.AddObject(this);
@@ -826,7 +820,7 @@ namespace FishNet.Object
         internal void Deinitialize(bool asServer)
         {
 #if PREDICTION_V2
-            Prediction_Deinitialize(asServer);
+            Prediction_Deinitialize();
 #endif
             InvokeStopCallbacks(asServer);
             for (int i = 0; i < NetworkBehaviours.Length; i++)

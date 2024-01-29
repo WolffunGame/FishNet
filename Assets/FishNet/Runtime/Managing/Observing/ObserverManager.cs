@@ -234,7 +234,18 @@ namespace FishNet.Managing.Observing
         /// </summary>
         internal void CalculateLevelOfDetail(uint tick)
         {
-            
+            //PROSTART
+            int count = GetLevelOfDetailDistances().Count;
+            for (int i = (count - 1); i > 0; i--)
+            {
+                uint interval = _levelOfDetailIntervals[i];
+                if (tick % interval == 0)
+                {
+                    LevelOfDetailIndex = (byte)i;
+                    return;
+                }
+            }
+            //PROEND
             //If here then index is 0 and interval is every tick.
             LevelOfDetailIndex = 0;
         }
@@ -247,7 +258,66 @@ namespace FishNet.Managing.Observing
 #if !FISHNET_PRO
             _enableNetworkLod = false;
 #endif
-            
+            //PROSTART
+            if (!_enableNetworkLod)
+                return;
+
+            //No distances specified.
+            if (_levelOfDetailDistances == null || _levelOfDetailDistances.Count == 0)
+            {
+                if (_networkManager != null)
+                {
+                    _networkManager.LogWarning("Level of detail distances contains no entries. NetworkLOD has been disabled.");
+                    _enableNetworkLod = false;
+                }
+                return;
+            }
+
+            //Make sure every distance is larger than the last.
+            float lastDistance = float.MinValue;
+            foreach (float dist in _levelOfDetailDistances)
+            {
+                if (dist <= 0f || dist <= lastDistance)
+                {
+                    if (_networkManager != null)
+                    {
+                        _networkManager.LogError($"Level of detail distances must be greater than 0f, and each distance larger than the previous. NetworkLOD has been disabled.");
+                        _enableNetworkLod = false;
+                    }
+                    return;
+                }
+                lastDistance = dist;
+            }
+
+            int maxEntries = 8;
+            //Too many distances.
+            if (_levelOfDetailDistances.Count > maxEntries)
+            {
+                _networkManager?.LogWarning("There can be a maximum of 8 level of detail distances. Entries beyond this quantity have been discarded.");
+                while (_levelOfDetailDistances.Count > maxEntries)
+                    _levelOfDetailDistances.RemoveAt(_levelOfDetailDistances.Count - 1);
+            }
+
+            if (Application.isPlaying)
+            {
+                //Build intervals and sqr distances.
+                int count = _levelOfDetailDistances.Count;
+                _levelOfDetailIntervals = new uint[count];
+                for (int i = (count - 1); i > 0; i--)
+                {
+                    uint power = (uint)Mathf.Pow(2, i);
+                    _levelOfDetailIntervals[i] = power;
+
+                }
+                //Sqr
+                for (int i = 0; i < count; i++)
+                {
+                    float dist = _levelOfDetailDistances[i];
+                    dist *= dist;
+                    _levelOfDetailDistances[i] = dist;
+                }
+            }
+            //PROEND
         }
 
     }

@@ -46,7 +46,9 @@ namespace FishNet
             {
                 "FISHNET",
                 thisVersion,
-                
+                //PROSTART
+                proDefine,
+                //PROEND
             };
             bool modified = false;
             //Now add FN defines.
@@ -55,7 +57,9 @@ namespace FishNet
 
             /* Remove pro define if not on pro. This might look a little
              * funny because the code below varies depending on if pro or not. */
-            
+            //PROSTART
+            if (1 == 2)
+                //PROEND
 #pragma warning disable CS0162 // Unreachable code detected
                 modified |= definesHs.Remove(proDefine);
 #pragma warning restore CS0162 // Unreachable code detected

@@ -30,7 +30,9 @@ namespace FishNet.Demo.NetworkLod
         {
             //Check for pro...this will stay false if not on a pro package.
             bool isPro = false;
-            
+            //PROSTART
+            isPro = true;
+            //PROEND
             if (!isPro)
             {
                 Debug.LogError($"Network Level of Detail demo requires Fish-Networking Pro to work.");

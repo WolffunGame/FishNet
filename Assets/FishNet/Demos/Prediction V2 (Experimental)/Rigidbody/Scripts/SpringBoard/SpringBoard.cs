@@ -1,14 +1,8 @@
-using FishNet.CodeGenerating;
 using FishNet.Object;
-using FishNet.Object.Prediction;
-using FishNet.Transporting;
-using GameKit.Dependencies.Utilities;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FishNet.PredictionV2
 {
-
     public class SpringBoard : NetworkBehaviour
     {
 #if PREDICTION_V2
@@ -17,20 +11,8 @@ namespace FishNet.PredictionV2
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.TryGetComponent(out RigidbodyPredictionV2 rp2))
-            {
-                if (PredictionManager.IsReconciling)
-                    Debug.Log($"Frame {Time.frameCount}. Replay LocalTick {PredictionManager.ClientReplayTick}. Last  MdTick {rp2.LastMdTick}. Velocity {rp2.Rigidbody.velocity.magnitude}");
-                else
-                    Debug.Log($"Frame {Time.frameCount}. Current LocalTick {TimeManager.LocalTick}. MdTick {rp2.LastMdTick}. Velocity {rp2.Rigidbody.velocity.magnitude}");
-                //rp2.Rigidbody.AddForce(Vector3.left * Force, ForceMode.Impulse);
-                //rp2.Rigidbody.AddImpulseVelocity(Vector3.left * Force);
-                rp2.PRB.AddForce(Vector3.left * Force, ForceMode.Impulse, true);
-            }
-            else
-            {
-                Debug.LogError($"SOME OTHER OBJECT HIT");
-            }
+            if (other.TryGetComponent(out Rigidbody rigid))
+                rigid.AddForce(Vector3.left * Force, ForceMode.Impulse);
         }
 
 #endif
@@ -38,16 +20,14 @@ namespace FishNet.PredictionV2
 
 }
 
-public class PredictionRigidbody
+public class PredictionRigidBody
 {
-    public Rigidbody Rigidbody { get; private set; }
+    // ReSharper disable once MemberCanBePrivate.Global
+    public Rigidbody RigidBody { get; private set; }
 
     private Vector3 _impulse;
     private Vector3 _force;
-    public PredictionRigidbody(Rigidbody rb)
-    {
-        Rigidbody = rb;
-    }
+    public PredictionRigidBody(Rigidbody rb) => RigidBody = rb;
 
 
     public void AddForce(Vector3 force, ForceMode mode = ForceMode.Force, bool afterSimulation = false)
@@ -60,12 +40,10 @@ public class PredictionRigidbody
 
         if (_impulse != Vector3.zero)
         {
-            Rigidbody.AddForce(_impulse, ForceMode.Impulse);
+            RigidBody.AddForce(_impulse, ForceMode.Impulse);
             _impulse = Vector3.zero;
         }
 
-        Rigidbody.AddForce(force, mode);
+        RigidBody.AddForce(force, mode);
     }
-
-
 }

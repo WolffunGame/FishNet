@@ -62,7 +62,9 @@ namespace FishNet.Component.Transforming.Editing
             GameKitEditing.AddObjectField("Script:", MonoScript.FromMonoBehaviour((NetworkTransform)target), typeof(NetworkTransform), false, EditorLayoutEnableType.Disabled);
 
             bool isPro = false;
-            
+            //PROSTART
+            isPro = true;
+            //PROEND
             if (isPro)
                 EditorGUILayout.HelpBox(EditingConstants.PRO_ASSETS_UNLOCKED_TEXT, MessageType.None);
             else
