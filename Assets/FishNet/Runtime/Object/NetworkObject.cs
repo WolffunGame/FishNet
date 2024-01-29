@@ -277,6 +277,9 @@ namespace FishNet.Object
             _isStatic = gameObject.isStatic;
             RuntimeChildNetworkBehaviours = CollectionCaches<NetworkBehaviour>.RetrieveList();
             SetChildDespawnedState();
+#if PREDICTION_V2
+            //Prediction_Awake();
+#endif
         }
 
         protected virtual void Start()
@@ -398,7 +401,10 @@ namespace FishNet.Object
         }
 
 #if PREDICTION_V2
-        private void Update()=>Prediction_Update();
+        private void Update()
+        {
+            Prediction_Update();
+        }
 #endif
 
         /// <summary>

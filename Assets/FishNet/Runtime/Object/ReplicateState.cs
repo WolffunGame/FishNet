@@ -47,14 +47,14 @@ namespace FishNet.Object
         /// <summary>
         /// Returns if value is replayed.
         /// </summary>
-        public static bool IsReplayed(this ReplicateState value) => value is ReplicateState.ReplayedPredicted or ReplicateState.ReplayedCreated or ReplicateState.Future;
+        public static bool IsReplayed(this ReplicateState value) => (value == ReplicateState.ReplayedPredicted || value == ReplicateState.ReplayedCreated || value == ReplicateState.Future);
         /// <summary>
         /// Returns if value is user created.
         /// </summary>
-        public static bool IsCreated(this ReplicateState value) => value is ReplicateState.CurrentCreated or ReplicateState.ReplayedCreated;
+        public static bool IsCreated(this ReplicateState value) => (value == ReplicateState.CurrentCreated || value == ReplicateState.ReplayedCreated);
         /// <summary>
         /// Returns if value is predicted.
         /// </summary>
-        public static bool IsPredicted(this ReplicateState value) => value is ReplicateState.Future or ReplicateState.CurrentPredicted or ReplicateState.ReplayedPredicted;
+        public static bool IsPredicted(this ReplicateState value) => (value == ReplicateState.Future || value == ReplicateState.CurrentPredicted || value == ReplicateState.ReplayedPredicted);
     }
 }
