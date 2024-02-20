@@ -5,16 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="077f6930-06d3-41ab-843e-fd7c8b70d491" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/DefaultSceneProcessor.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/DefaultSceneProcessor.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/Events/UnloadSceneEventArgs.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/Events/UnloadSceneEventArgs.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/PreferredActiveScenes.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/PreferredActiveScenes.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/SceneLoadData.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/SceneLoadData.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/SceneUnloadData.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/LoadUnloadDatas/SceneUnloadData.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneLookupData.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneLookupData.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneManager.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneProcessorBase.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/SceneProcessorBase.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/UnloadedScene.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Managing/Scened/UnloadedScene.cs.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Connection/NetworkConnection.CustomUserData.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/FishNet/Runtime/Connection/NetworkConnection.CustomUserData.cs.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.FishNet/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FishNet/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/FishNet/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/FishNet/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +119,7 @@
       <workItem from="1705031744360" duration="1676000" />
       <workItem from="1705034427009" duration="309000" />
       <workItem from="1706497140424" duration="6407000" />
-      <workItem from="1708398386888" duration="299000" />
+      <workItem from="1708398386888" duration="1261000" />
     </task>
     <servers />
   </component>
