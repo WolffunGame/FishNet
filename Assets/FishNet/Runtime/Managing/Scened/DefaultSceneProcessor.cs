@@ -94,10 +94,7 @@ namespace FishNet.Managing.Scened
         /// Returns the progress on the current scene load or unload.
         /// </summary>
         /// <returns></returns>
-        public override float GetPercentComplete()
-        {
-            return (CurrentAsyncOperation == null) ? 1f : CurrentAsyncOperation.progress;
-        }
+        public override float GetPercentComplete() => CurrentAsyncOperation?.progress ?? 1f;
 
         /// <summary>
         /// Adds a loaded scene.
@@ -145,14 +142,11 @@ namespace FishNet.Managing.Scened
             do
             {
                 notDone = false;
-                foreach (AsyncOperation ao in LoadingAsyncOperations)
+                foreach (var ao in LoadingAsyncOperations)
                 {
-
-                    if (!ao.isDone)
-                    {
-                        notDone = true;
-                        break;
-                    }
+                    if (ao.isDone) continue;
+                    notDone = true;
+                    break;
                 }
                 yield return null;
             } while (notDone);
