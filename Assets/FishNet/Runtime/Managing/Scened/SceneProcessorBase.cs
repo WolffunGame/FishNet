@@ -95,7 +95,7 @@ namespace FishNet.Managing.Scened
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerator AsyncsIsDone();
+        public abstract IEnumerator IsDone();
 
         /// <summary>
         /// Returns the MovedObjectsScene.

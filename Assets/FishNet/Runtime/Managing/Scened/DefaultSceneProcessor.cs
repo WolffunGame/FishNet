@@ -139,7 +139,7 @@ namespace FishNet.Managing.Scened
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public override IEnumerator AsyncsIsDone()
+        public override IEnumerator IsDone()
         {
             bool notDone;
             do
@@ -156,10 +156,6 @@ namespace FishNet.Managing.Scened
                 }
                 yield return null;
             } while (notDone);
-
-            yield break;
         }
     }
-
-
 }
