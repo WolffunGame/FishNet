@@ -29,7 +29,7 @@ namespace FishNet.Managing.Server
         private void ParseNetworkLODUpdate(PooledReader reader, NetworkConnection conn)
         {
             //PROSTART
-            if (!conn.Authenticated)
+            if (!conn.IsAuthenticated)
                 return;
             if (!_cachedUseLod)
             {

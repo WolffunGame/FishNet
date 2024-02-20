@@ -39,7 +39,7 @@ namespace FishNet.Managing.Client
         internal void TrySendLodUpdate(uint localTick, bool forceFullUpdate)
         {
             //PROSTART
-            if (!Connection.Authenticated)
+            if (!Connection.IsAuthenticated)
                 return;
             NetworkManager nm = NetworkManager;
             if (forceFullUpdate)
@@ -59,135 +59,135 @@ namespace FishNet.Managing.Client
             //Set next tick.
             Connection.LastLevelOfDetailUpdate = localTick;
 
-            List<NetworkObject> localClientSpawned = nm.ClientManager.Objects.LocalClientSpawned;
-            int spawnedCount = localClientSpawned.Count;
-            if (spawnedCount == 0)
-                return;
-
-            //Rebuild position cache for players objects.
-            _objectsPositionsCache.Clear();
-            foreach (NetworkObject playerObject in Connection.Objects)
-            {
-                //Might be null under certain irregular conditions as clientHost.
-                if (playerObject != null)
-                    _objectsPositionsCache.Add(playerObject.transform.position);
-            }
-
-            /* Set the maximum number of entries per send.
-             * Each send is going to be approximately 3 bytes
-             * but sometimes can be 4. Calculate based off the maximum
-             * possible bytes. */
-            //int mtu = NetworkManager.TransportManager.GetMTU((byte)Channel.Reliable);
-            const int estimatedMaximumIterations = ( 400 / 4);
-            /* Aim to process all objects over at most 10 seconds.
-             * To reduce the number of packets sent objects are
-             * calculated ~twice a second. This means if the client had
-             * 1000 objects visible to them they would need to process
-            * 100 objects a second, so 50 objects every half a second.
-            * This should be no problem even on slower mobile devices. */
-            int iterations;
-            //Normal update.
-            if (!forceFullUpdate)
-            {
-                iterations = Mathf.Min(spawnedCount, estimatedMaximumIterations);
-            }
-            //Force does a full update.
-            else
-            {
-                _nextLodNobIndex = 0;
-                iterations = spawnedCount;
-            }
-
-            //Cache a few more things.
-            Dictionary<NetworkObject, NetworkConnection.LevelOfDetailData> currentLods = Connection.LevelOfDetails;
-            List<float> lodDistances = NetworkManager.ObserverManager.GetLevelOfDetailDistances();
-
-            //Index to use next is too high so reset it.
-            if (_nextLodNobIndex >= spawnedCount)
-                _nextLodNobIndex = 0;
-            int nobIndex = _nextLodNobIndex;
-
             PooledWriter tmpWriter = WriterPool.Retrieve(1000);
             int written = 0;
 
-            //Only check if player has objects.
-            if (_objectsPositionsCache.Count > 0)
+            List<NetworkObject> localClientSpawned = nm.ClientManager.Objects.LocalClientSpawned;
+            int spawnedCount = localClientSpawned.Count;
+            if (spawnedCount != 0)
             {
-                for (int i = 0; i < iterations; i++)
+                //Rebuild position cache for players objects.
+                _objectsPositionsCache.Clear();
+                foreach (NetworkObject playerObject in Connection.Objects)
                 {
-                    NetworkObject nob = localClientSpawned[nobIndex];
-                    //Somehow went null. Can occur perhaps if client destroys objects between ticks maybe.
-                    if (nob == null)
-                    {
-                        IncreaseObjectIndex();
-                        continue;
-                    }
-                    //Only check objects not owned by the local client.
-                    if (!nob.IsOwner && !nob.IsDeinitializing)
-                    {
-                        Vector3 nobPosition = nob.transform.position;
-                        float closestDistance = float.MaxValue;
-                        foreach (Vector3 objPosition in _objectsPositionsCache)
-                        {
-                            float dist = Vector3.SqrMagnitude(nobPosition - objPosition);
-                            if (dist < closestDistance)
-                                closestDistance = dist;
-                        }
+                    //Might be null under certain irregular conditions as clientHost.
+                    if (playerObject != null)
+                        _objectsPositionsCache.Add(playerObject.transform.position);
+                }
 
-                        //If not within any distances then max lod will be used, the value below.
-                        byte lod = (byte)(lodDistances.Count - 1);
-                        for (byte z = 0; z < lodDistances.Count; z++)
+                /* Set the maximum number of entries per send.
+                 * Each send is going to be approximately 3 bytes
+                 * but sometimes can be 4. Calculate based off the maximum
+                 * possible bytes. */
+                //int mtu = NetworkManager.TransportManager.GetMTU((byte)Channel.Reliable);
+                const int estimatedMaximumIterations = (400 / 4);
+                /* Aim to process all objects over at most 10 seconds.
+                 * To reduce the number of packets sent objects are
+                 * calculated ~twice a second. This means if the client had
+                 * 1000 objects visible to them they would need to process
+                * 100 objects a second, so 50 objects every half a second.
+                * This should be no problem even on slower mobile devices. */
+                int iterations;
+                //Normal update.
+                if (!forceFullUpdate)
+                {
+                    iterations = Mathf.Min(spawnedCount, estimatedMaximumIterations);
+                }
+                //Force does a full update.
+                else
+                {
+                    _nextLodNobIndex = 0;
+                    iterations = spawnedCount;
+                }
+
+                //Cache a few more things.
+                Dictionary<NetworkObject, NetworkConnection.LevelOfDetailData> currentLods = Connection.LevelOfDetails;
+                List<float> lodDistances = NetworkManager.ObserverManager.GetLevelOfDetailDistances();
+
+                //Index to use next is too high so reset it.
+                if (_nextLodNobIndex >= spawnedCount)
+                    _nextLodNobIndex = 0;
+                int nobIndex = _nextLodNobIndex;
+
+                //Only check if player has objects.
+                if (_objectsPositionsCache.Count > 0)
+                {
+                    for (int i = 0; i < iterations; i++)
+                    {
+                        NetworkObject nob = localClientSpawned[nobIndex];
+                        //Somehow went null. Can occur perhaps if client destroys objects between ticks maybe.
+                        if (nob == null)
                         {
-                            //Distance is within range of this lod.
-                            if (closestDistance <= lodDistances[z])
+                            IncreaseObjectIndex();
+                            continue;
+                        }
+                        //Only check objects not owned by the local client.
+                        if (!nob.IsOwner && !nob.IsDeinitializing)
+                        {
+                            Vector3 nobPosition = nob.transform.position;
+                            float closestDistance = float.MaxValue;
+                            foreach (Vector3 objPosition in _objectsPositionsCache)
                             {
-                                lod = z;
-                                break;
+                                float dist = Vector3.SqrMagnitude(nobPosition - objPosition);
+                                if (dist < closestDistance)
+                                    closestDistance = dist;
+                            }
+
+                            //If not within any distances then max lod will be used, the value below.
+                            byte lod = (byte)(lodDistances.Count - 1);
+                            for (byte z = 0; z < lodDistances.Count; z++)
+                            {
+                                //Distance is within range of this lod.
+                                if (closestDistance <= lodDistances[z])
+                                {
+                                    lod = z;
+                                    break;
+                                }
+                            }
+
+                            bool changed;
+                            /* See if value changed. Value is changed
+                             * if it's not the same of old or if
+                             * the nob has not yet been added to the 
+                             * level of details collection. 
+                             * Even if a forced update only delta
+                             * needs to send. */
+                            NetworkConnection.LevelOfDetailData cachedLod;
+                            if (currentLods.TryGetValue(nob, out cachedLod))
+                            {
+                                changed = (cachedLod.CurrentLevelOfDetail != lod);
+                            }
+                            else
+                            {
+                                cachedLod = ObjectCaches<NetworkConnection.LevelOfDetailData>.Retrieve();
+                                currentLods[nob] = cachedLod;
+                                changed = true;
+                            }
+
+                            //If changed then set new value and write.
+                            if (changed)
+                            {
+                                cachedLod.Update(lod);
+                                tmpWriter.WriteNetworkObjectId(nob.ObjectId);
+                                tmpWriter.WriteByte(lod);
+                                written++;
                             }
                         }
 
-                        bool changed;
-                        /* See if value changed. Value is changed
-                         * if it's not the same of old or if
-                         * the nob has not yet been added to the 
-                         * level of details collection. 
-                         * Even if a forced update only delta
-                         * needs to send. */
-                        NetworkConnection.LevelOfDetailData cachedLod;
-                        if (currentLods.TryGetValue(nob, out cachedLod))
-                        {
-                            changed = (cachedLod.CurrentLevelOfDetail != lod);
-                        }
-                        else
-                        {
-                            cachedLod = ObjectCaches<NetworkConnection.LevelOfDetailData>.Retrieve();
-                            currentLods[nob] = cachedLod;
-                            changed = true;
-                        }
+                        IncreaseObjectIndex();
 
-                        //If changed then set new value and write.
-                        if (changed)
+                        void IncreaseObjectIndex()
                         {
-                            cachedLod.Update(lod);
-                            tmpWriter.WriteNetworkObjectId(nob.ObjectId);
-                            tmpWriter.WriteByte(lod);
-                            written++;
+                            nobIndex++;
+                            if (nobIndex >= spawnedCount)
+                                nobIndex = 0;
                         }
-                    }
-
-                    IncreaseObjectIndex();
-                    
-                    void IncreaseObjectIndex()
-                    {
-                        nobIndex++;
-                        if (nobIndex >= spawnedCount)
-                            nobIndex = 0;
                     }
                 }
-            }
 
-            //Set next lod index to current nob index.
-            _nextLodNobIndex = nobIndex;
+                //Set next lod index to current nob index.
+                _nextLodNobIndex = nobIndex;
+            }
             /* Send using the reliable channel since
              * we are using deltas. This is also why
              * updates are sent larger chunked twice a second rather

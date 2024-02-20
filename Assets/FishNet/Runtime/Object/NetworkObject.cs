@@ -395,17 +395,10 @@ namespace FishNet.Object
             void DeinitializePrediction_V2(bool asServer)
             {
 #if PREDICTION_V2
-                Prediction_Deinitialize();
+                Prediction_Deinitialize(asServer);
 #endif
             }
         }
-
-#if PREDICTION_V2
-        private void Update()
-        {
-            Prediction_Update();
-        }
-#endif
 
         /// <summary>
         /// Initializes NetworkBehaviours if they are disabled.
@@ -557,11 +550,18 @@ namespace FishNet.Object
             _networkObserverInitiliazed = true;
 
 #if PREDICTION_V2
-            Prediction_PreInitialize(networkManager, asServer);
+            Prediction_Preinitialize(networkManager, asServer);
 #endif
             //Add to connections objects. Collection is a hashset so this can be called twice for clientHost.
             owner?.AddObject(this);
         }
+
+#if PREDICTION_V2
+        private void Update()
+        {
+            Prediction_Update();
+        }
+#endif
 
         /// <summary>
         /// Sets this NetworkObject as a child of another at runtime.
@@ -741,7 +741,7 @@ namespace FishNet.Object
                 else
                     SerializedRootNetworkBehaviour = parentNob.NetworkBehaviours[0];
             }
-             
+
             //Transforms which can be searched for networkbehaviours.
             List<Transform> transformCache = CollectionCaches<Transform>.RetrieveList();
             NestedRootNetworkBehaviours.Clear();
@@ -826,7 +826,7 @@ namespace FishNet.Object
         internal void Deinitialize(bool asServer)
         {
 #if PREDICTION_V2
-            Prediction_Deinitialize();
+            Prediction_Deinitialize(asServer);
 #endif
             InvokeStopCallbacks(asServer);
             for (int i = 0; i < NetworkBehaviours.Length; i++)
@@ -945,8 +945,8 @@ namespace FishNet.Object
             }
 
             //After changing owners invoke callbacks.
-            InvokeOwnership(prevOwner, asServer);
-
+            InvokeOwnershipChange(prevOwner, asServer);
+             
             //If asServer send updates to clients as needed.
             if (asServer)
             {
