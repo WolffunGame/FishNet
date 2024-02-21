@@ -830,7 +830,7 @@ namespace FishNet.Object
             //If not not found then it's being run as predicted.
             else
             {
-                data = replicatesHistory.Count >= 1 ? replicatesHistory[^ 1] : default;
+                data = default;
                 data.SetTick(replayTick);
                 if (replicatesHistory.Count == 0 || replicatesHistory[^1].GetTick() < replayTick)
                     state = ReplicateState.Future;
