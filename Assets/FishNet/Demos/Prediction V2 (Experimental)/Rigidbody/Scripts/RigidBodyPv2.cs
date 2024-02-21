@@ -14,9 +14,6 @@ namespace FishNet.PredictionV2
         [SerializeField] private float _jumpForce = 15f;
         [SerializeField] private float _moveRate = 15f;
         [SerializeField] private float _interval = 0.1f;
-
-        [SerializeField] private float _delayJump = 0.1f;
-
         private JumpState _jumpState;
         private float _curTime;
 
@@ -61,9 +58,10 @@ namespace FishNet.PredictionV2
         public uint LastMdTick;
 
         [Replicate]
-        private void Move(MoveData md, ReplicateState state = ReplicateState.Invalid,
-            Channel channel = Channel.Unreliable)
+        private void Move(MoveData md, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
         {
+            if (state.IsPredicted() && !Owner.IsLocalClient)
+                return;
             LastMdTick = md.GetTick();
             var forces = new Vector3(md.Horizontal, 0f, md.Vertical) * _moveRate;
             forces += Physics.gravity * 3f;
@@ -79,21 +77,21 @@ namespace FishNet.PredictionV2
             switch (_jumpState)
             {
                 case JumpState.None when md.Jump:
-                    _jumpState = JumpState.Prepare;
-                    _curTime = _delayJump;
+                    Jump();
                     return;
                 case JumpState.Prepare:
-                    _jumpState = JumpState.None;
-                    _curTime = _interval;
-                    Jump();
-                    break;
-                default:
                 case JumpState.Jumping:
+                default:
                     break;
             }
         }
 
-        private void Jump() => RigidBody.AddForce(new Vector3(0f, _jumpForce, 0f), ForceMode.Impulse);
+        private void Jump()
+        {
+            _jumpState = JumpState.None;
+            _curTime = _interval;
+            RigidBody.AddForce(new Vector3(0f, _jumpForce, 0f), ForceMode.Impulse);
+        }
 
         private void SendReconcile()
         {
