@@ -60,8 +60,6 @@ namespace FishNet.PredictionV2
         [Replicate]
         private void Move(MoveData md, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
         {
-            if (state.IsPredicted() && !Owner.IsLocalClient)
-                return;
             LastMdTick = md.GetTick();
             var forces = new Vector3(md.Horizontal, 0f, md.Vertical) * _moveRate;
             forces += Physics.gravity * 3f;
