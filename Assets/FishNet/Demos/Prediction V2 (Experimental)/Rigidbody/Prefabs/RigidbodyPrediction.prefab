@@ -167,7 +167,7 @@ MonoBehaviour:
   _predictionType: 1
   _graphicalObject: {fileID: 303449599178274091}
   _enableStateForwarding: 1
-  _ownerInterpolation: 1
+  _ownerInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
   <PrefabId>k__BackingField: 13
@@ -209,7 +209,6 @@ MonoBehaviour:
   _jumpForce: 15
   _moveRate: 15
   _interval: 0.1
-  _delayJump: 0.15
   LastMdTick: 0
 --- !u!114 &4015040241597399059
 MonoBehaviour:
