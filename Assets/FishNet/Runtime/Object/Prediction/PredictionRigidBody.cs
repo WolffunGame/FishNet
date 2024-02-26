@@ -27,7 +27,7 @@ namespace FishNet.Object.Prediction
         //}
     }
 
-    public class PredictionRigidbody : IResettable
+    public class PredictionRigidBody : IResettable
     {
         #region Types.
         internal struct ForceData
@@ -66,7 +66,7 @@ namespace FishNet.Object.Prediction
         internal List<ForceData> PendingForces;
         #endregion
 
-        ~PredictionRigidbody()
+        ~PredictionRigidBody()
         {
             if (PendingForces != null)
                 CollectionCaches<ForceData>.StoreAndDefault(ref PendingForces);
@@ -154,13 +154,13 @@ namespace FishNet.Object.Prediction
         /// <summary>
         /// Reconciles to a state.
         /// </summary>
-        public void Reconcile(PredictionRigidbody pr)
+        public void Reconcile(PredictionRigidBody pr)
         {
             PendingForces.Clear();
             foreach (ForceData item in pr.PendingForces)
                 PendingForces.Add(new ForceData(item));
 
-            ResettableObjectCaches<PredictionRigidbody>.Store(pr);
+            ResettableObjectCaches<PredictionRigidBody>.Store(pr);
         }
 
         /// <summary>
