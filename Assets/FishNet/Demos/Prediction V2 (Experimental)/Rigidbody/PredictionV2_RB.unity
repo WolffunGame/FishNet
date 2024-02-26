@@ -139,7 +139,7 @@ MonoBehaviour:
   _timingType: 0
   _allowTickDropping: 0
   _maximumFrameTicks: 2
-  _tickRate: 30
+  _tickRate: 60
   _pingInterval: 1
   _physicsMode: 1
 --- !u!114 &192429405
@@ -193,7 +193,7 @@ MonoBehaviour:
   _intermediateLayer: {fileID: 0}
   _latencySimulator:
     _enabled: 0
-    _simulateHost: 1
+    _simulateHost: 0
     _latency: 5
     _outOfOrder: 0
     _packetLoss: 0
@@ -233,10 +233,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e08bb003fce297d4086cf8cba5aa459a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _queuedInputs: 0
+  _queuedInputs: 4
   _dropExcessiveReplicates: 1
   _maximumServerReplicates: 15
-  _redundancyCount: 2
+  _redundancyCount: 4
   _allowPredictedSpawning: 0
   _reservedObjectIds: 15
 --- !u!114 &192429410
@@ -1444,7 +1444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d3606bfdac5a4743890fc1a5ecd8f24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _autoStartType: 1
+  _autoStartType: 0
   _stoppedColor: {r: 0.25490198, g: 0.25490198, b: 0.25490198, a: 1}
   _changingColor: {r: 0.78431374, g: 0.6862745, b: 0, a: 1}
   _startedColor: {r: 0, g: 0.5882353, b: 0.64705884, a: 1}

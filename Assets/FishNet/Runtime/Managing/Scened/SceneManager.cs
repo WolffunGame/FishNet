@@ -1184,7 +1184,7 @@ namespace FishNet.Managing.Scened
 
                 _sceneProcessor.ActivateLoadedScenes();
                 //Wait until everything is loaded (done).
-                yield return _sceneProcessor.IsDone();
+                yield return _sceneProcessor.AsyncsIsDone();
                 _sceneProcessor.LoadEnd(data);
 
                 /* Wait until loadedScenes are all marked as done.

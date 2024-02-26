@@ -1,7 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace GameKit.Dependencies.Utilities.Types
 {
+
+
     public class DDOL : MonoBehaviour
     {
         #region Public.
@@ -17,16 +20,20 @@ namespace GameKit.Dependencies.Utilities.Types
         public static DDOL GetDDOL()
         {
             //Not yet made.
-            if (_instance != null) return _instance;
-            var obj = new GameObject
+            if (_instance == null)
             {
-                name = "FirstGearGames DDOL"
-            };
-            var ddol = obj.AddComponent<DDOL>();
-            DontDestroyOnLoad(ddol);
-            _instance = ddol;
-            return ddol;
+                GameObject obj = new GameObject();
+                obj.name = "FirstGearGames DDOL";
+                DDOL ddol = obj.AddComponent<DDOL>();
+                DontDestroyOnLoad(ddol);
+                _instance = ddol;
+                return ddol;
+            }
             //Already  made.
+            else
+            {
+                return _instance;
+            }
         }
     }
 

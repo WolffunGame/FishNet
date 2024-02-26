@@ -94,7 +94,10 @@ namespace FishNet.Managing.Scened
         /// Returns the progress on the current scene load or unload.
         /// </summary>
         /// <returns></returns>
-        public override float GetPercentComplete() => CurrentAsyncOperation?.progress ?? 1f;
+        public override float GetPercentComplete()
+        {
+            return (CurrentAsyncOperation == null) ? 1f : CurrentAsyncOperation.progress;
+        }
 
         /// <summary>
         /// Adds a loaded scene.
@@ -136,20 +139,27 @@ namespace FishNet.Managing.Scened
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public override IEnumerator IsDone()
+        public override IEnumerator AsyncsIsDone()
         {
             bool notDone;
             do
             {
                 notDone = false;
-                foreach (var ao in LoadingAsyncOperations)
+                foreach (AsyncOperation ao in LoadingAsyncOperations)
                 {
-                    if (ao.isDone) continue;
-                    notDone = true;
-                    break;
+
+                    if (!ao.isDone)
+                    {
+                        notDone = true;
+                        break;
+                    }
                 }
                 yield return null;
             } while (notDone);
+
+            yield break;
         }
     }
+
+
 }

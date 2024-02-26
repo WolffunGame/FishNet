@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityScene = UnityEngine.SceneManagement.Scene;
 using UnitySceneManager = UnityEngine.SceneManagement.SceneManager;
 
 namespace FishNet.Managing.Scened
@@ -33,7 +34,10 @@ namespace FishNet.Managing.Scened
         /// Initializes this script for use.
         /// </summary>
         /// <param name="manager">SceneManager which will be utilizing this class.</param>
-        public virtual void Initialize(SceneManager manager) => SceneManager = manager;
+        public virtual void Initialize(SceneManager manager)
+        {
+            SceneManager = manager;
+        }
         /// <summary>
         /// Called when scene loading has begun.
         /// </summary>
@@ -95,7 +99,7 @@ namespace FishNet.Managing.Scened
         /// Returns if all asynchronized tasks are considered IsDone.
         /// </summary>
         /// <returns></returns>
-        public abstract IEnumerator IsDone();
+        public abstract IEnumerator AsyncsIsDone();
 
         /// <summary>
         /// Returns the MovedObjectsScene.
