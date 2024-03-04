@@ -1,8 +1,6 @@
 # Ignore everything:
 /Assets/*
 !/Assets/FishNet
-!*.json
-!*.json.meta
 !.gitignore
 
 DefaultPrefabObjects.asset
